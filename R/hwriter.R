@@ -2,24 +2,26 @@
 ## HTML writing functions
 ## gregoire.pau@ebi.ac.uk
 
-## TODO:
-## - unify documentation + man
-## - w3c
-## - vignette
-## - FF, Safari, IE6
-## - capture
+## version 0.92
+## - pstrick removed from Rnw
+## - fixed width table
+## - openPage head
+## - inst/images + system.file to load images
+## - hwriteImage with vector url.image
 
 ## TODO:
 ## - lists
 ## - split.table, split.table.args
-## - row & col switch
 ## - th headings
 ## - missing
 ## - CSS class
 ## - clever global style, row.style handling
 ## - div sections (not span)
 ## - quick row.bgcolor, row.style, 1.bgcolor
-## - unearth writeCells 
+## - unearth writeCells
+## - table for one element
+## - FIX: col.width doesn't work if nothing on the first row
+## - FIX: split.max.x require a matrix for link even if data is a 1-row vector
 
 hwrite=function(x,page=NULL,...)
   UseMethod('hwrite')
@@ -89,7 +91,7 @@ hwriteImage=function(image.url,page=NULL,image.border=0,width=NULL,height=NULL,c
     if (is.null(height)) height=400
     dev.print(png,width=width,height=height,image.url)
   }
-  str=hmakeTag('img',border=image.border,src=image.url,alt=image.url)
+  str=hmakeTag('img',border=image.border,src=image.url,alt=image.url,width=width,height=height)
 
   ## final
   hwrite(str,page,...)
@@ -101,7 +103,7 @@ hwriteCells=function(url.image,caption,page=NULL,ncol=4,link.image=NULL,...) {
   if (length(url.image)!=n) stop('\'url.image\' must be as long as nrow(caption)')
 
   ## format images
-  imgf=hwriteImage(url.image,br=FALSE,table=FALSE,link=link.image)
+  imgf=hwriteImage(url.image,table=FALSE,link=link.image)
   
   ## combine table, rotate tables and write the resulting table
   data=t(cbind(image=imgf,caption))
@@ -124,12 +126,13 @@ hmakeTag=function(tag,data=NULL,newline=FALSE,...) {
   attrs=list(...)
 
   if (is.null(data)) data=''
-  n=length(data)
   na=length(attrs)
 
   ## attributes grid
   xattrs=NULL
   if (na>0) {
+    namax=max(sapply(attrs,length))
+    n=max(c(length(tag),length(data),namax))
     xattrs=matrix('',nr=n,nc=na)
     nattrs=names(attrs)
     for (i in 1:na) {
@@ -140,6 +143,7 @@ hmakeTag=function(tag,data=NULL,newline=FALSE,...) {
     }
     xattrs=apply(xattrs,1,paste,collapse='')
   }
+  
   if (newline) nl='\n' else nl=NULL
   paste('<',tag,xattrs,'>',nl,data,'</',tag,'>',nl,sep='')
 }

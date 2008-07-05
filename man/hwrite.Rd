@@ -150,7 +150,16 @@ widths unspecified.}
 }
 
 \examples{
- hwriter:::writeExample()
+ ## Short example	
+ tmpdir <- tempdir()
+ p <- openPage('test.html', dirname=tmpdir)
+ hwrite('Iris', p, center=TRUE, heading=1)
+ hwrite(iris[1:10,], p, row.bgcolor='#ffccaa')
+ closePage(p)
+ if (interactive()) try(browseURL(file.path(tmpdir, 'test.html')))
+ 
+ ## Long example
+ hwriter:::showExample()
 }
 
 \author{

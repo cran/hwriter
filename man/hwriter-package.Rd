@@ -33,7 +33,7 @@ creation.
 }
 
 \examples{
- hwriter:::writeExample()
+ hwriter:::showExample()
 }
 
 \author{

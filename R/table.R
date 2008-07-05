@@ -61,7 +61,7 @@ hmapRowCol=function(x,rowcolnames) {
 ## consumes: col.link, row.link, col.bgcolor, row.bgcolor
 ## consumes: @split.maxncol, @split.maxnrow
 ## uses: bgcolor, link, col.width
-hwrite.table=function(data,page=NULL,row.names=T,col.names=T,col.link=NULL,row.link=NULL,link=NULL,col.bgcolor=NULL,row.bgcolor=NULL,bgcolor=NULL,split.maxncol=NULL,split.maxnrow=NULL,width=NULL,col.width=NULL,row.style=NULL,col.style=NULL,style=NULL,...) { 
+hwrite.table=function(data,page=NULL,row.names=T,col.names=T,col.link=NULL,row.link=NULL,link=NULL,col.bgcolor=NULL,row.bgcolor=NULL,bgcolor=NULL,split.maxncol=NULL,split.maxnrow=NULL,col.width=NULL,row.style=NULL,col.style=NULL,style=NULL,...) { 
   ## process row and column names (add a col and a row, resp.)
   acol=row.names & !is.null(rownames(data))
   arow=col.names & !is.null(colnames(data))
@@ -119,10 +119,10 @@ hexpand=function(a,db) {
 
 ## private, flow
 ## consumes: border, cellspacing, cellpadding
-## consumes: bgcolor, link, br, center, style
+## consumes: bgcolor, link, style
 ## consumes: width, icol.width
 ## consumes: @wiki
-hwriteRawTable=function(data,page=NULL,border=1,cellspacing=NA,cellpadding=NA,link=NULL,bgcolor=NULL,wiki=F,br=F,style=NULL,center=F,width=NULL,icol.width=NULL) {
+hwriteRawTable=function(data,page=NULL,border=1,cellspacing=NA,cellpadding=NA,link=NULL,bgcolor=NULL,wiki=FALSE,style=NULL,width=NULL,icol.width=NULL,...) {
   if (!is.matrix(data)) stop('\'data\' must be a matrix')
   dim=dim(data)
   data=as.vector(data)
@@ -160,7 +160,7 @@ hwriteRawTable=function(data,page=NULL,border=1,cellspacing=NA,cellpadding=NA,li
     cellpadding=cellpadding,newline=T,style=gstyle,width=width)
   
   ## final
-  hwrite(str,page,br=br,center=center)
+  hwrite(str,page,...)
 }
 
 ## private

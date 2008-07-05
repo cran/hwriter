@@ -54,10 +54,11 @@ easily a current plot and to insert it in a web page.
 
 \examples{
 ## Creates a new web page 'test.html'
-p <- openPage('test.html')
+tmpdir <- tempdir()
+p <- openPage('test.html', dirname=tmpdir)
 
 ## Insert an external image
-img=hwriteImage('http://www.ebi.ac.uk/~gpau/hwriter/iris1.jpg', center=TRUE)
+img <- hwriteImage('http://www.ebi.ac.uk/~gpau/hwriter/iris1.jpg', center=TRUE)
 hwrite(c(img,caption='Iris'), p, dim=c(2,1),
 row.style=list(caption='text-align:center;background-color:#fac'),
 row.names=FALSE, br=TRUE)
@@ -66,7 +67,7 @@ row.names=FALSE, br=TRUE)
 closePage(p)
 
 ## Opens a web browser to see the result
-browseURL('test.html')
+if (interactive()) try(browseURL(file.path(tmpdir, 'test.html')))
 }
 
 \author{

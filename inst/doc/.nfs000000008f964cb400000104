@@ -14,12 +14,13 @@
 \newcommand{\Rmethod}[1]{{\textit{#1}}}
 \newcommand{\Rfunarg}[1]{{\textit{#1}}}
 
-\SweaveOpts{eps=FALSE}
+
 
 \title{The hwriter package}
 
 \author{Gregoire Pau}
 
+\usepackage{Sweave}
 \begin{document}
 
 \maketitle
@@ -46,10 +47,18 @@ It is not easy to render what an HTML writing package could do in a PDF document
 named \Rfunction{example-hwriter.html} which contains many documented examples, all with R sources and resulting HTML outputs.
 
 %
-<<example>>=
-library('hwriter')
-example('hwriter')
-@
+\begin{Schunk}
+\begin{Sinput}
+> library("hwriter")
+> example("hwriter")
+\end{Sinput}
+\begin{Soutput}
+hwritr>  hwriter:::showExample()
+Building the example webpage /tmp/Rtmpf0IGux/example-hwriter.html ...
+Opening a web browser on /tmp/Rtmpf0IGux/example-hwriter.html ...
+OK. A web page showing all the examples should have been opened.
+\end{Soutput}
+\end{Schunk}
 %
 
 \end{document}

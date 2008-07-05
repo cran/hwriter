@@ -19,7 +19,7 @@ hmakeTag(tag, data=NULL, newline=FALSE, ...)
 
   \item{newline}{a logical. Appends a newline \code{\\n} character at the end of the tag.}	
 
-  \item{...}{optional arguments that will be appended in the tag.}
+  \item{...}{optional arguments that will be appended to the tag.}
 
 }
 
