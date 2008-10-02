@@ -16,7 +16,7 @@ height=NULL, capture=FALSE, ...)
 }
 
 \arguments{
-  \item{image.url}{a character string containing the URL of an image,
+  \item{image.url}{a character vector containing the URL of an image,
     which can be also a path to a local filename.}
   
   \item{page}{an optional connection, a character string naming the file to write
@@ -39,13 +39,19 @@ Default is 0.}
 }
 
 \value{
-  A character string containing the output HTML code.
+  A character vector containing the output HTML code.
 }
 
 \details{
  \code{hwriteImage} constructs an HTML <img> tag to insert a image. This function can be seamlessly in conjuction with \code{hwrite}
 to position an image. The \code{capture} argument enables to capture
 easily a current plot and to insert it in a web page.
+
+By default, if \code{image.url} is a vector the output value will be a
+character string containing the HTML code of a table containing the
+images. This behaviour is dictated by the underlying \code{hwrite} call
+made by \code{hwriteImage}. The argument \code{table} can be set to
+TRUE to obtain a vector of HTML image tags instead.
 }
 
 \seealso{

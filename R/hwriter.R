@@ -9,6 +9,11 @@
 ## - inst/images + system.file to load images
 ## - hwriteImage with vector url.image
 
+## version 0.93
+## - remove splash 
+## - unearth writeCells
+## - simpler doc
+
 ## TODO:
 ## - lists
 ## - split.table, split.table.args
@@ -18,7 +23,6 @@
 ## - clever global style, row.style handling
 ## - div sections (not span)
 ## - quick row.bgcolor, row.style, 1.bgcolor
-## - unearth writeCells
 ## - table for one element
 ## - FIX: col.width doesn't work if nothing on the first row
 ## - FIX: split.max.x require a matrix for link even if data is a 1-row vector
@@ -97,21 +101,7 @@ hwriteImage=function(image.url,page=NULL,image.border=0,width=NULL,height=NULL,c
   hwrite(str,page,...)
 }
 
-## public
-hwriteCells=function(url.image,caption,page=NULL,ncol=4,link.image=NULL,...) {
-  n=nrow(caption)
-  if (length(url.image)!=n) stop('\'url.image\' must be as long as nrow(caption)')
-
-  ## format images
-  imgf=hwriteImage(url.image,table=FALSE,link=link.image)
-  
-  ## combine table, rotate tables and write the resulting table
-  data=t(cbind(image=imgf,caption))
-  
-  hwrite(data,page,split.maxncol=ncol,...)
-}
-
-hwriter.resync=function() {
+resync=function() {
   try(detach('package:hwriter'),silent=TRUE)
   hwrite=NULL
   source('R/hwriter.R')

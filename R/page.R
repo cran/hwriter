@@ -1,5 +1,5 @@
 ## public
-openPage=function(filename,dirname=NULL,title=filename,head=NULL) {
+openPage=function(filename, dirname=NULL, title=filename, head=NULL) {
   if (!is.null(dirname)) {
     if (!file.exists(dirname)) dir.create(dirname,rec=T,showWar=F)
     filename=file.path(dirname,filename)
@@ -18,9 +18,10 @@ getHwriterVersion=function() {
 }
 
 ## public
-closePage=function(page) {
+closePage=function(page, splash=TRUE) {
   hwriterlink=hwrite('hwriter',link='http://www.ebi.ac.uk/~gpau/hwriter/index.html')
-  hwrite(paste('\n<br/><br/><font size=\"-2\">(Page generated on ',date(),' by ',hwriterlink,' ',getHwriterVersion(),')</font>',sep=''),page,br=T)
-  hwrite('</body></html>',page,br=F)
+  if (splash) hwrite(paste('\n<br/><br/><font size=\"-2\">(Page generated on ',date(),' by ',hwriterlink,' ',getHwriterVersion(),')</font>',sep=''),page,br=T)
+  else hwrite('\n<br/><br/>', page, br=TRUE)
+  hwrite('</body></html>', page, br=FALSE)
   close(page)
 }
