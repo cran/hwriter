@@ -9,7 +9,7 @@
 }
 
 \usage{
-hwrite(x, page=NULL, ...)
+  hwrite(x, page=NULL, ...)
 }
 
 \arguments{
@@ -18,130 +18,102 @@ hwrite(x, page=NULL, ...)
 
   \item{page}{an optional connection, a character string naming the file to write
     to or a page object returned by \code{openPage}.}
-
-  \item{...}{optional arguments depending on the type of
-    \code{x}. See Details.}
-
+  
+  \item{...}{optional arguments. See Details.}
 }
 
 \value{
-  A character string containing the output HTML code.
+  A character vector containing the output HTML code.
 }
 
 \details{
-  Depending on its type and its length, \code{x} is written as a
-  character string, a character vector or as an HTML table.
+  If \code{x} is a vector of only one element, it will be written by default
+  as an HTML text element unless \code{table} is \code{TRUE}: in that case,
+  it will be written as an HTML table containing an unique element.
 
-  Many optional arguments can be used to render an R object. Arguments are listed below and rendering
-examples are shown in Examples.
+  If \code{x} is a vector of more than one element, a matrix or a data.frame, it will be
+  written by default as an HTML table unless \code{table} is \code{FALSE}: in that case,
+  it will be written as a vector or a matrix of HTML text elements.
 
-  Following optional arguments can be always used, independently of the
-  type of \code{x}:
+  Many optional arguments can be used to render an HTML object. See below for
+  additional information. Many comprehensive examples can be found in the
+  Examples section by typing \code{example(hwrite)}.
+}
 
+\section{General arguments}{
+  The following optional arguments can always be used:
   \describe{
-    %\item{class}{a character string containing a CSS style class to be used.
-    %  The style class should exist in the current stylesheet, see
-    %  \code{openPage} for details on managing stylesheets.  Default
-    %  available style classes include \code{'verbatim'}, \code{'cleantable'}, see Examples.
-    %  This option is the HTML equivalent of <div>.}
-    
-    %\item{style}{a character string containing a CSS inline style to be
-    %  used. This argument is the HTML equivalent of <div>.}
-    
-    \item{br}{a logical specifying if a breakline (carriage return) should
+  \item{br}{a logical specifying if a breakline (carriage return) should
       be appended at the end of \code{x}. Default is \code{FALSE}.}
     
-    %\item{wiki}{a logical indicating is the resulting HTML code is meant to be
-    %  inserted in a Wikimedia page, switching to the special Wikimedia HTML
-    %  code conventions. Default is \code{FALSE}.}
+  \item{table}{a logical controlling if the object \code{x} should be written as an HTML table. Default is \code{TRUE} for matrices and vectors containing more than one element, and \code{FALSE} otherwise. If set to \code{FALSE}, the object is written as a vector (or a matrix) of HTML text elements.}
+
+  \item{link}{a character vector containing the URLs the HTML element
+      will point to. This argument is the equivalent of the attribute \code{href} of the HTML tag <a>.}
     
-    \item{center}{a logical indicating if \code{x} should be centered. 
-Default is \code{FALSE}.}
+  \item{name}{a character string naming the HTML element for further reference. This is the equivalent of the attribute \code{name} of the HTML tag <a>.}
+    
+  \item{div}{a logical. If \code{TRUE}, places the HTML element into a HTML section, using the <div> HTML tag. This is helpful for styling a section. Default is \code{FALSE}.}
+    
+  \item{center}{a logical indicating if \code{x} should be centered. Default is \code{FALSE}. This element may interfere with the current CSS style. Please consider the use the CSS style attribute "text-align" instead.}
+   
+  \item{...}{Additional arguments are added to the HTML element as HTML attributes. For HTML tables, attributes are distributed on table cells using R recycling rules. For text elements, a <span> HTML tag (or <div> if \code{div} is \code{TRUE}) is used to accommodate the attributes.} 
   }
 }
 
 \section{Additional arguments for text elements}{
-  If \code{x} is a vector of only one element, it will be written as a
-  character string. Following optional arguments can be used:
+  If \code{x} is rendered as an HTML text element, the following optional arguments can be used:
   
   \describe{ 
-  \item{heading}{a numeric containing the heading level style. Valid values spans from 1 to 5. See Examples. }
-    
-  \item{link}{a character string containing an URL the HTML output text
-      will point to. This argument is the HTML equivalent of <a>.}
-    
-  \item{style}{a character string containing the CSS inline style to be used to render the object. This
-      versatile argument allows to change the font properties (typeface, bold, italic, size, color), margins,
-      alignement, spacing, padding. See Examples. }
+  \item{heading}{a numeric containing the heading level style. Valid values spans from 1 to 5. See Examples.}
   }
 }
 
-  
 \section{Additional arguments for vectors}{
-  If \code{x} is a vector with more than one element, it will be written 
-as an
-  HTML table by default unless \code{table} is set to \code{FALSE}, for which
-  it will be written as a vector of character strings. Optional 
-specific
-  arguments to either character strings or HTML tables can be used,
-  together with the following ones:
+  If \code{x} is a vector with more than one element, the following optional
+  arguments can be used:
   
   \describe{ 
-  \item{table}{If \code{TRUE}, the vector is written as an HTML table
-      with one row and a number of columns equals to the number of elements
-      in \code{x}. If \code{FALSE}, the vector is written as a character vector. Default is \code{TRUE}.}
- 
-  \item{dim}{a couple of numeric values indicating the desired number of rows
-      and columns in the table. Can be used only if \code{table} is
-      \code{TRUE}.}
+  \item{dim}{a couple of optional numeric values indicating the desired number of rows
+      and columns in the table. This is useful to orient a vector.}
     
-  \item{byrow}{logical. If \code{FALSE} the table is filled by
-      columns, otherwise the table is filled by rows. Can be used only if \code{table} is
-      \code{TRUE}. Default is \code{FALSE}.}
-   
+  \item{byrow}{logical. If \code{TRUE}, the table is filled by
+      rows first, otherwise the table is filled by columns first. Default is \code{FALSE}.}
+    
   \item{names}{a logical indicating if the names of the elements should
       be written if the vector is named. Default is \code{TRUE}.}
-
   }
 }
 
 \section{Additional arguments for tables}{
-  If \code{x} is a matrix or a data.frame, \code{x} is written as an 
-HTML table. Following optional arguments can be used:
+  If \code{x} is rendered as an HTML table element, the following optional arguments can be used:
   
   \describe{ 
   \item{border}{a numeric. Specifies the table border width. A value of 0 implies that no borders will be drawn.
-      Default border styles are not really pretty. Use 'style' instead to have a finer control on borders.}
-
-  \item{row.names, col.names}{a logical value indicating whether the row (resp. columns) names of
+      This argument may interfere with the "border" CSS style attribute.}
+    
+  \item{row.names, col.names}{a logical value indicating whether the row (resp. column) names of
       \code{x} are to be written. Default is \code{TRUE}.}
     
-  \item{bgcolor}{a character string or a character matrix. Specifies the cell background colors, in HTML color format (hexadecimal or color names). 
-      If \code{bgcolor} is a character string, the whole table will be painted with this color. If \code{bgcolor} is a character matrix of the same
-      size as \code{x} which contains the cell colors, cells will be painted accordingly to the matrix. A matrix can contain NAs when cells don't have 
-      a background color. The matrix may contain one extra row and/or column to target the heading (row.names, col.names) table cells. See Examples.}
-      
-  \item{row.bgcolor, col.bgcolor}{a list of named character vectors. This argument may contain a list of named vectors of colors pointing the corresponding rows (resp. columns) names of \code{x}. If sizes don't match, values are recycled using R style. Unnamed vector of colors will point the heading rows (resp. columns). See Examples.}
-    
-  \item{style, row.style, col.style}{These arguments follows the same 
-rules as \code{bgcolor}, \code{row.bgcolor} and \code{col.bgcolor} but define
- CSS styles that should be used to render table cells. CSS styles are very versatile and allow to change border style, typeface, font properties, align, boldness, font color, italic... See Examples.}
-    
-  \item{link, row.link, col.link}{These arguments follows the same rules 
-as \code{bgcolor}, \code{row.bgcolor} and \code{col.bgcolor} but 
-define here URLs that the cells will point to.  See Examples.}
-
-  \item{cellspacing, cellpadding}{a numeric. Defines the HTML cell 
-spacing and HTML cell pading settings of the table. See Examples.}
+  \item{cellspacing, cellpadding}{a numeric. Defines the spacing and padding space in pixels between cells. These arguments may interfere with the "border" and "padding" CSS style attributes.}
     
   \item{width}{a character string. Specifies the global table width in HTML units (pixels or \%).}
-
-  \item{col.width}{a named character vector. Specifies the columns width 
-in HTML units (pixels or \%) where names of \code{col.width} are used to 
-point column names of \code{x}. NAs may be used to let some column 
-widths unspecified.}
+    
+  \item{col.width}{a named character vector. Specifies the columns width
+      in HTML units (pixels or \%) where names of \code{col.width} are used to
+      point column names of \code{x}. NAs may be used to let several column
+      widths unspecified.}
+      
+  \item{row.*, col.*}{a list of character vectors or a character vector. Distributes the attribute '*' on the HTML table cells, according to rows (resp. columns).
+      Named lists (or vectors) point the corresponding rows/columns, according to their names. Unnamed lists (or vectors) point the rows/columns in the numeric order and NAs can be used to omit rows/columns. If pointed rows/columns sizes don't match, values are recycled using R rules.}
+    
+  \item{table.*}{a character string. Uses the global table attribute '*' to render the HTML table. The attribute is added to the main <table> tag. Some uses include
+      setting of the "border" and "margin" CSS attributes that cannot be distributed on cells.}
+    
+  \item{*}{a character string, vector or matrix. Distributes the attribute '*' on the HTML table cells, using R recycling rules.
+      Any valid HTML attributes can be used. The value may contain NAs to omit cells. Matrices may contain one extra row and/or column to target heading cells.}
   }
-
+  
   See Examples for many illustrated examples of all arguments.
 }
 
@@ -150,15 +122,6 @@ widths unspecified.}
 }
 
 \examples{
- ## Short example	
- tmpdir <- tempdir()
- p <- openPage('test.html', dirname=tmpdir)
- hwrite('Iris', p, center=TRUE, heading=1)
- hwrite(iris[1:10,], p, row.bgcolor='#ffccaa')
- closePage(p)
- if (interactive()) try(browseURL(file.path(tmpdir, 'test.html')))
- 
- ## Long example
  hwriter:::showExample()
 }
 

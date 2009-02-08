@@ -9,28 +9,26 @@
 }
 
 \usage{
-hmakeTag(tag, data=NULL, newline=FALSE, ...)
+hmakeTag(tag, data=NULL, ..., newline=FALSE)
 }
 
 \arguments{
-  \item{tag}{a character vector containing the name of the HTML/XML tag.}
+  \item{tag}{a character vector or matrix containing the HTML/XML tags.}
 
-  \item{data}{a character vector containing the body of the tag.}
+  \item{data}{a character vector or matrix containing the tag bodies.}
 
-  \item{newline}{a logical. Appends a newline \code{\\n} character at the end of the tag.}	
+  \item{newline}{a logical. Appends a newline \code{\\n} character at the end of the tags.}	
 
-  \item{...}{optional arguments that will be appended to the tag.}
-
+  \item{...}{optional attributes that will be appended to the tags.}
 }
 
 \value{
-  A string containing the output HTML/XML tag.
+  A character vector or matrix, containing the output HTML/XML tags.
 }
 
 \details{
- This low-level function is used by \code{hwrite} to build HTML tags,
- which is doing all the HTML formatting job. This function is useful to
- build non-standard or rare HTML tags.
+ This low-level function is used by \code{hwrite} to build HTML tags.
+ This function is useful to build non-standard or rare HTML tags.
 }
 
 \seealso{

@@ -1,0 +1,36 @@
+version 1.0: (CRAN)
+- major release
+- before: automatic 'style', now: 'table.style' and 'style' 
+- no NA anymore in default arguments
+- extra attributes *, row.*, col.*, table.* are now consumed
+- div sections
+- nice example with CSS stylesheet
+- wiki attribute removed
+- name anchor
+
+version 0.95:
+- fixed bug on rowcol naming
+- fixed bug on class, id and onClick support 
+
+version 0.94:
+- hwrite uses table.style instead of style for <table> styling
+- new logic for rowcol processing
+- hwrite supports table.class, table.id and table.onClick
+- hmakeTag supports matrices
+- hwrite supports class, id and onClick arguments
+- openPage supports CSS and Javascript
+- hwrite supports the 'table' argument for single element vectors
+
+version 0.93: (CRAN)
+- remove splash 
+- writeCells removed
+- simpler doc
+
+version 0.92:
+- pstrick removed from Rnw
+- fixed width table
+- openPage head
+- inst/images + system.file to load images
+- hwriteImage with vector url.image
+
+

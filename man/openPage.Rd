@@ -6,12 +6,13 @@
 \title{HTML document/page management}
 
 \description{
- Opens and closes a HTML page/document, allowing a sequential building
+ Opens and closes an HTML page/document, allowing a sequential building
  of an HTML page.
 }
 
 \usage{
-openPage(filename, dirname=NULL, title=filename, head=NULL)
+openPage(filename, dirname=NULL, title=filename, link.javascript=NULL, 
+link.css=NULL, css=NULL, head=NULL)
 
 closePage(page, splash=TRUE)
 }
@@ -25,6 +26,14 @@ closePage(page, splash=TRUE)
 
   \item{title}{an optional character string containing the title of the
     HTML page.}
+
+  \item{link.javascript}{an optional character vector containing the URL of Javascripts
+    to be associated with the page.}
+
+  \item{link.css}{an optional character vector containing the URL of CSS stylesheets
+    to be associated with the page.}
+
+  \item{css}{an optional character vector containing inline CSS stylesheets to be associated with the page.}
 
   \item{head}{an optional character string containing an HTML fragment
     to be added in the <head> section of the page.}
@@ -44,10 +53,9 @@ closePage(page, splash=TRUE)
 \details{
  \code{openPage} opens a new file for writing and returns a page handle
  which is used by \code{hwrite} to append HTML elements in a current
- page. A previous existing file will be overwritten.
+ page. Any previous existing file will be overwritten.
 
- The argument \code{head} is useful to add CSS links or HTML script tags in the
- page header. Use \code{hmakeTag} to easily build HTML tags.
+ The argument \code{head} is useful to add extra HTML code in the <head> header code.
 
  \code{closePage} ends the HTML page formatting, flushes the pending
 writing operations and closes the file.
@@ -60,9 +68,10 @@ writing operations and closes the file.
 \examples{
 ## Creates a new web page 'test.html' in the R temporary directory
 tmpdir <- tempdir()
-p <- openPage('test.html', dirname=tmpdir)
+p <- openPage('test.html', dirname=tmpdir, link.css='http://www.ebi.ac.uk/~gpau/hwriter/hwriter.css')
 hwrite('Iris example', p, center=TRUE, heading=1)
-hwrite(iris, p, row.bgcolor='#ffa')
+hwrite('This famous (Fisher\'s or Anderson\'s) iris data set gives the measurements in centimeters of the variables sepal length and width and petal length and width, respectively, for 50 flowers from each of 3 species of iris.', p, class='king')
+hwrite(iris, p, row.bgcolor='#ffffaa')
 closePage(p)
 
 ## Opens a web browser on the web page

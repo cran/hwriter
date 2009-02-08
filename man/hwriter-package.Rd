@@ -8,8 +8,8 @@
 \description{
   \code{hwriter} is an easy-to-use package able to format and
   output R objects in HTML format. It supports advanced formatting,
-  tables, CSS styling, images and provides a convenient mapping between
-  R  tables and HTML tables.
+  tables, CSS styling, Javascript, images and provides a convenient mapping between
+  R tables and HTML tables.
 
   See Examples and \code{hwrite} for more details.
 

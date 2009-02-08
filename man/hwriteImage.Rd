@@ -5,19 +5,18 @@
 \title{Insert an HTML image}
 
 \description{
-  Inserts an image in an HTML document. The image can be either an
-  external one specified by an URL or can be captured from the current
+  Inserts one or several images in an HTML document. The images can be either
+  external ones specified by URL or file path, or captured from the current
   graphic device.
 }
 
 \usage{
-hwriteImage(image.url, page=NULL, image.border=0, width=NULL,
-height=NULL, capture=FALSE, ...)
+hwriteImage(image.url, page=NULL, ..., image.border=0, width=NULL,
+height=NULL, capture=FALSE)
 }
 
 \arguments{
-  \item{image.url}{a character vector containing the URL of an image,
-    which can be also a path to a local filename.}
+  \item{image.url}{a character vector or matrix containing the URL or the file path of images.}
   
   \item{page}{an optional connection, a character string naming the file to write
     to or a page object returned by \code{openPage}.}
@@ -43,7 +42,7 @@ Default is 0.}
 }
 
 \details{
- \code{hwriteImage} constructs an HTML <img> tag to insert a image. This function can be seamlessly in conjuction with \code{hwrite}
+ \code{hwriteImage} constructs an HTML <img> tag to insert one or several images. This function can be seamlessly in conjuction with \code{hwrite}
 to position an image. The \code{capture} argument enables to capture
 easily a current plot and to insert it in a web page.
 
@@ -51,7 +50,7 @@ By default, if \code{image.url} is a vector the output value will be a
 character string containing the HTML code of a table containing the
 images. This behaviour is dictated by the underlying \code{hwrite} call
 made by \code{hwriteImage}. The argument \code{table} can be set to
-TRUE to obtain a vector of HTML image tags instead.
+\code{TRUE} to obtain a vector of HTML image tags instead.
 }
 
 \seealso{

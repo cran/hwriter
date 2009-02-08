@@ -1,32 +1,3 @@
-## hwriter
-## HTML writing functions
-## gregoire.pau@ebi.ac.uk
-
-## version 0.92
-## - pstrick removed from Rnw
-## - fixed width table
-## - openPage head
-## - inst/images + system.file to load images
-## - hwriteImage with vector url.image
-
-## version 0.93
-## - remove splash 
-## - unearth writeCells
-## - simpler doc
-
-## TODO:
-## - lists
-## - split.table, split.table.args
-## - th headings
-## - missing
-## - CSS class
-## - clever global style, row.style handling
-## - div sections (not span)
-## - quick row.bgcolor, row.style, 1.bgcolor
-## - table for one element
-## - FIX: col.width doesn't work if nothing on the first row
-## - FIX: split.max.x require a matrix for link even if data is a 1-row vector
-
 hwrite=function(x,page=NULL,...)
   UseMethod('hwrite')
 
@@ -46,12 +17,18 @@ hwrite.data.frame=function(x,...)
   hwrite.table(as.matrix(x),...)
 
 ## public, flow
-## - switch between hwriteString and hwrite.matrix
-## - redimension 'dim' and 'byrow' matrix orientation
-## consumes: names, table, byrow, dim
-hwrite.vector=function(data,page=NULL,names=TRUE,table=TRUE,byrow=FALSE,dim=NULL,...) {
-  if (length(data)<=1||!table) hwriteString(data,page=page,...)
-  else {
+## switch between hwriteString and hwrite.matrix
+## redimension 'dim' and 'byrow' matrix orientation
+hwrite.vector=function(data,page=NULL,...,table=NULL,names=NULL,byrow=NULL,dim=NULL) {
+  ## default arguments
+  if (is.null(table)) {
+    if (length(data)<=1) table=FALSE
+    else table=TRUE
+  }
+  if (is.null(names)) names=TRUE
+  if (is.null(byrow)) byrow=FALSE
+    
+  if (table) {
     if (is.null(dim)) dim=c(1,length(data))
     datanames=names(data)
     data=matrix(data,nrow=dim[1],ncol=dim[2],byrow=byrow)
@@ -62,21 +39,47 @@ hwrite.vector=function(data,page=NULL,names=TRUE,table=TRUE,byrow=FALSE,dim=NULL
       if (dim[2]==length(datanames)) colnames(data)=datanames
     }
     hwrite.matrix(data,page=page,...)
-  }
+  } else hwriteString(data,page=page,...)
 }
 
 ## private, flow
-## consumes: center, heading, link, br, wiki, style
-hwriteString=function(txt,page=NULL,link=NULL,heading=NULL,center=FALSE,br=FALSE,wiki=FALSE,style=NULL) {
-  if (br) txt=paste(txt,'<br/>\n',sep='')
+## ultimate string writing function
+hwriteString=function(txt,page=NULL,...,link=NULL,name=NULL,heading=NULL,center=NULL,br=NULL,div=NULL) {
+  ## default arguments
+  if (is.null(br)) br=FALSE
+  if (is.null(center)) center=FALSE
+  if (is.null(div)) div=FALSE
+  args=list(...)
+
+  ## box text with:
+  ## - 'a'    if link is non-null or name is non-null
+  ## - 'h*'   if heading is non-null
+  ## - 'div'  if div is TRUE
+  ## - 'span' if args are present
+  ## - no box otherwise
+  boxtag=NULL
   if (!is.null(link)) {
-    if (wiki) txt=paste('[',link,' ',txt,']',sep='')
-    else txt=hmakeTag('a',txt,href=link)
+    args=c(args,list(href=link))
+    boxtag='a'
   }
-  if (!is.null(heading)) txt=hmakeTag(paste('h',heading,sep=''),txt)
-  if (center) txt=hmakeTag('center',txt)
-  if (!is.null(style)) txt=hmakeTag('span',txt,style=style)
+  else if (!is.null(name)) {
+    args=c(args,list(name=name))
+    boxtag='a'
+  }
+  else if (!is.null(heading)) boxtag=paste('h',heading,sep='')
+  else if (div) boxtag='div'
+  else if (length(args)>0) boxtag='span'
+
+  ## box text
+  if (!is.null(boxtag)) txt=do.call(hmakeTag,c(list(boxtag,txt),args))
   
+  ## center
+  if (center) txt=hmakeTag('center',txt)
+  
+  ## line break
+  if (br) txt=paste(txt,'<br/>\n',sep='')
+
+   ## final output
   if (is.null(page)) txt
   else if (is.character(page)) {
     p=openPage(page)
@@ -87,8 +90,7 @@ hwriteString=function(txt,page=NULL,link=NULL,heading=NULL,center=FALSE,br=FALSE
 }
 
 ## public
-## consume: image.border, width, height
-hwriteImage=function(image.url,page=NULL,image.border=0,width=NULL,height=NULL,capture=FALSE,...) {
+hwriteImage=function(image.url,page=NULL,...,image.border=0,width=NULL,height=NULL,capture=FALSE) {
   ## take a snapshot of the current device ?
   if (capture) {
     if (is.null(width)) width=400
@@ -96,7 +98,7 @@ hwriteImage=function(image.url,page=NULL,image.border=0,width=NULL,height=NULL,c
     dev.print(png,width=width,height=height,image.url)
   }
   str=hmakeTag('img',border=image.border,src=image.url,alt=image.url,width=width,height=height)
-
+  
   ## final
   hwrite(str,page,...)
 }
@@ -112,8 +114,12 @@ resync=function() {
 }
 
 ## public
-hmakeTag=function(tag,data=NULL,newline=FALSE,...) {
+hmakeTag=function(tag,data=NULL,...,newline=FALSE) {
   attrs=list(...)
+
+  ## dim is the output dim of the result
+  dim=dim(tag)
+  if (!is.null(dim(data))) dim=dim(data)
 
   if (is.null(data)) data=''
   na=length(attrs)
@@ -126,14 +132,18 @@ hmakeTag=function(tag,data=NULL,newline=FALSE,...) {
     xattrs=matrix('',nr=n,nc=na)
     nattrs=names(attrs)
     for (i in 1:na) {
-      if (!is.null(attrs[[i]])) {
-        fna=!is.na(attrs[[i]])
-        xattrs[fna,i]=paste(' ',nattrs[i],'=\"',attrs[[i]][fna],'\"',sep='')
+      z=attrs[[i]]
+      if (!is.null(z)) {
+        fna=!is.na(z)
+        xattrs[fna,i]=paste(' ',nattrs[i],'=\"',z[fna],'\"',sep='')
+        if (!is.null(dim(z))) dim=dim(z)
       }
     }
     xattrs=apply(xattrs,1,paste,collapse='')
   }
   
   if (newline) nl='\n' else nl=NULL
-  paste('<',tag,xattrs,'>',nl,data,'</',tag,'>',nl,sep='')
+  res=paste('<',tag,xattrs,'>',nl,data,'</',tag,'>',nl,sep='')
+  if (!is.null(dim)) res=array(res,dim=dim)
+  res
 }

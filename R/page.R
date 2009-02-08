@@ -1,5 +1,5 @@
 ## public
-openPage=function(filename, dirname=NULL, title=filename, head=NULL) {
+openPage=function(filename, dirname=NULL, title=filename, link.javascript=NULL, link.css=NULL, css=NULL,head=NULL) {
   if (!is.null(dirname)) {
     if (!file.exists(dirname)) dir.create(dirname,rec=T,showWar=F)
     filename=file.path(dirname,filename)
@@ -7,7 +7,12 @@ openPage=function(filename, dirname=NULL, title=filename, head=NULL) {
   page=file(filename,'wt')
   doctype='<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n'
   meta=hmakeTag('meta',NULL,'http-equiv'='Content-Type',content="text/html; charset=utf-8",newline=F)
-  head=paste(meta,hmakeTag('title',title),head,sep='\n')
+  
+  if (!is.null(link.javascript)) link.javascript=paste(hmakeTag('script',language='JavaScript',src=link.javascript),collapse='\n')
+  if (!is.null(link.css)) link.css=paste(hmakeTag('link',rel='stylesheet',type='text/css',href=link.css),collapse='\n')
+  if (!is.null(css)) css=paste(hmakeTag('style',css),collapse='\n')
+  
+  head=paste(meta,hmakeTag('title',title),head,link.javascript,link.css,css,sep='\n')
   head=hmakeTag('head',head,newline=T)
   hwrite(paste(doctype,"<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>",head,'<body>'),page)
   page

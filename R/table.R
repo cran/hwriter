@@ -1,38 +1,43 @@
 ## private
-## - process .row or .col argument on its corresponding rcdata matrix
-hprocessRowCol=function(rowcol,rcdata,data,horientation=T) {
-  dim=dim(data)
-  if (is.null(rcdata)) rcdata=matrix(NA,nr=dim[1],nc=dim[2])
-  if (length(rowcol)==1 & is.null(names(rowcol))) {
-    rowcol=as.list(rowcol)
-    names(rowcol)=''
-  }
-  if (!is.list(rowcol)) stop(paste('\'',deparse(substitute(rowcol), 500),'\' must be a list',sep=''))
-  
-  nrowcol=names(rowcol)
-  if (horientation) {
-    if (is.null(rownames(data))) z=1
-    else z=match(nrowcol,rownames(data))
-    dmax=dim[2]
-  }
-  else {
-    if (is.null(colnames(data))) z=1
-    else z=match(nrowcol,colnames(data))
-    dmax=dim[1]
-  }
-
-  if (length(z)>0) {
-    for (i in 1:length(z)) {
-      if (!is.na(z[i])) {
-        rc=rowcol[[i]]
-        if (length(rc)==1) dmin=1
-        else dmin=(dmax-length(rc)+1)
-        if (horientation) rcdata[z[i],dmin:dmax]=rc
-        else rcdata[dmin:dmax,z[i]]=rc
+## process .row or .col argument on its corresponding rcdata matrix
+## location rule:
+## - if rowcol named, expand it to dim(data)[kaxis], with first '' to headers
+## - if rowcol unnamed of size 1, apply to header
+## fill rule:
+## - start at first data (not full) cell, if possible
+## - recycle is TRUE by default
+hprocessRowCol=function(rowcol,rcdata,data,axis,ddim,recycle=TRUE) {
+  if (!is.null(rowcol)) {
+    dim=dim(data)
+    if (axis==2) ndata=rownames(data)
+    else ndata=colnames(data)
+    kaxis=3-axis
+    
+    ## named case
+    nrowcol=names(rowcol)
+    if (!is.null(nrowcol)) {
+      if (is.null(ndata)) ndata=c('',rep(NA,dim[kaxis]-1))
+      rowcol=rowcol[match(ndata,nrowcol)]
+      if (is.list(rowcol)) rowcol=lapply(rowcol,function(z) if (is.null(z)) NA else z)
+    } else {
+      ## special rules to save room for the header:
+      ## - if rowcol has more than one element
+      ## - AND if one row/col has been added in the contraxis
+      ## - AND if length rowcol is different from the contraxis
+      if (length(rowcol)!=1 & dim[kaxis]!=ddim[kaxis] & length(rowcol)!=dim[kaxis]) rowcol=c(NA,rowcol)
+    }
+    
+    for (i in 1:length(rowcol)) {
+      rc=rowcol[[i]]
+      if (!all(is.na(rc))) {
+        if (recycle) rc=array(rc,dim=c(1,max(ddim[axis],length(rc))))
+        drc=length(rc)
+        j=ifelse(dim[axis]==drc,1,dim[axis]-ddim[axis]+1)
+        if (axis==1) rcdata[j:(drc+j-1),i]=rc 
+        else rcdata[i,j:(drc+j-1)]=rc
       }
     }
   }
-  
   rcdata
 }
 
@@ -57,39 +62,70 @@ hmapRowCol=function(x,rowcolnames) {
 
 ## public, flow
 ## - column and row names handling
-## consumes: row.names, col.names
-## consumes: col.link, row.link, col.bgcolor, row.bgcolor
-## consumes: @split.maxncol, @split.maxnrow
-## uses: bgcolor, link, col.width
-hwrite.table=function(data,page=NULL,row.names=T,col.names=T,col.link=NULL,row.link=NULL,link=NULL,col.bgcolor=NULL,row.bgcolor=NULL,bgcolor=NULL,split.maxncol=NULL,split.maxnrow=NULL,col.width=NULL,row.style=NULL,col.style=NULL,style=NULL,...) { 
+hwrite.table=function(data,page=NULL,...,table=TRUE,row.names=T,col.names=T,split.maxncol=NULL,split.maxnrow=NULL,col.width=NULL) { 
+  ddim=dim(data)
+
+  if (!table) {
+    z=hwrite(as.vector(data),table=FALSE,...)
+    dim(z)=ddim
+    return(z)
+  }
+  
   ## process row and column names (add a col and a row, resp.)
   acol=row.names & !is.null(rownames(data))
   arow=col.names & !is.null(colnames(data))
   if (acol) data=cbind(rownames(data),data)
   if (arow) data=rbind(colnames(data),data)
+
+  ## ddim is the data dim only (without extra col and/or row)
+  ## dim  is the expanded data
   dim=dim(data)
 
+  ## filters arguments
+  args=list(...)
+  nargs=names(args)
+ 
+  ## table arguments
+  itable=match(substr(nargs,1,6),'table.')
+  iptable=match(nargs,c('cellspacing','cellpadding','width','border'))
+  args.table=args[!is.na(itable)]
+  names(args.table)=substr(names(args.table),7,nchar(names(args.table)))
+  args.table=c(args.table,args[!is.na(iptable)])
+
+  ## row arguments
+  irow=match(substr(nargs,1,4),'row.')
+  args.row=args[!is.na(irow)]
+  names(args.row)=substr(names(args.row),5,nchar(names(args.row)))
+
+  ## col arguments
+  icol=match(substr(nargs,1,4),'col.')
+  args.col=args[!is.na(icol)]
+  names(args.col)=substr(names(args.col),5,nchar(names(args.col)))
+
+  ## string arguments
+  istring=match(nargs,c('name','heading','center','div','br'))
+  args.string=args[!is.na(istring)]
+
+  ## td arguments (remaining ones)
+  args.td=args[is.na(itable) & is.na(irow) & is.na(icol) & is.na(istring) & is.na(iptable)]
+  zargs=rep(list(NULL),length(args.row)+length(args.col))
+  names(zargs)=c(names(args.row),names(args.col))
+  args.td=c(args.td,zargs)
+  
   ## expand if needed
-  if (!is.null(link)) link=hexpand(link,dim)
-  if (!is.null(bgcolor)) bgcolor=hexpand(bgcolor,dim)
-  if (!is.null(style) & is.matrix(style)) style=hexpand(style,dim)
+  args.td=lapply(args.td,hexpand,dim,ddim)
+  
+  ## process .row and .cow arguments
+  for (z in names(args.col)) args.td[[z]]=hprocessRowCol(args.col[[z]],args.td[[z]],data,1,ddim)
+  for (z in names(args.row)) args.td[[z]]=hprocessRowCol(args.row[[z]],args.td[[z]],data,2,ddim)
 
-  ## process .row and .field arguments
-  if (!is.null(col.link)) link=hprocessRowCol(col.link,link,data,F)
-  if (!is.null(row.link)) link=hprocessRowCol(row.link,link,data,T)
-  if (!is.null(col.bgcolor)) bgcolor=hprocessRowCol(col.bgcolor,bgcolor,data,F)
-  if (!is.null(row.bgcolor)) bgcolor=hprocessRowCol(row.bgcolor,bgcolor,data,T)
-  if (!is.null(col.style)) {
-    if (!is.null(style) & !is.matrix(style)) style=hexpand(style,dim)
-    style=hprocessRowCol(col.style,style,data,F)
+  ## special case for col.width
+  if (!is.null(col.width)) {
+    width=array(NA,dim=dim)
+    icol.width=hmapRowCol(col.width,colnames(data))
+    width[1,1:length(icol.width)]= icol.width
+    args.td=c(args.td,list(width=width))
   }
-  if (!is.null(row.style)) {
-    if (!is.null(style) & !is.matrix(style)) style=hexpand(style,dim)
-    style=hprocessRowCol(row.style,style,data,T)
-  }
-
-  ## process col.width argument
-  icol.width=hmapRowCol(col.width,colnames(data))
 
   ## process split.maxncol and split.maxnrow
   if (!is.null(split.maxncol) | !is.null(split.maxnrow)) {
@@ -97,57 +133,42 @@ hwrite.table=function(data,page=NULL,row.names=T,col.names=T,col.link=NULL,row.l
     
     ## split ancillary tables
     data=hsplitArray(data,maxnrow=split.maxnrow,maxncol=split.maxncol,preserve.size=T,output.list=F,arow=arow,acol=acol)
-    link=hsplitArray(link,maxnrow=split.maxnrow,maxncol=split.maxncol,preserve.size=T,output.list=F,arow=arow,acol=acol)
-    bgcolor=hsplitArray(bgcolor,maxnrow=split.maxnrow,maxncol=split.maxncol,preserve.size=T,output.list=F,arow=arow,acol=acol)
-    style=hsplitArray(style,maxnrow=split.maxnrow,maxncol=split.maxncol,preserve.size=T,output.list=F,arow=arow,acol=acol)
+    for (z in names(args.td)) args.td[[z]]=hsplitArray(args.td[[z]],maxnrow=split.maxnrow,maxncol=split.maxncol,preserve.size=T,output.list=F,arow=arow,acol=acol)
   }
   
-  hwriteRawTable(data,page=page,link=link,bgcolor=bgcolor,style=style,icol.width=icol.width,...)
+  do.call(hwriteRawTable,c(list(data,page=page,args.td=args.td,args.table=args.table,args.string=args.string)))
 }
 
 ## private
-## expands a to be of size db, by adding top/left NA rows/columns if needed
-hexpand=function(a,db) {
+## expands a to be of size ddb (if possible) and put in a matrix
+## of size db, adding top/left NA rows/columns if needed
+hexpand=function(a,db,ddb) {
+  if (is.null(a)) a=NA
+  if (is.null(dim(a))) a=array(a,dim=ddb)
   da=dim(a)
-  if (length(a)==1) a=matrix(a[1],nr=db[1],nc=db[2])
-  else if (any(da!=db)) {
-    if (da[1]==db[1]-1) a=rbind(NA,a)
-    if (da[2]==db[2]-1) a=cbind(NA,a)
-  }
-  a
+  b=array(NA,dim=db)
+  i=ifelse(db[1]==da[1],1,db[1]-ddb[1]+1)
+  j=ifelse(db[2]==da[2],1,db[2]-ddb[2]+1)
+  b[i:(da[1]+i-1),j:(da[2]+j-1)]=a
+  b
 }
 
 ## private, flow
-## consumes: border, cellspacing, cellpadding
-## consumes: bgcolor, link, style
-## consumes: width, icol.width
-## consumes: @wiki
-hwriteRawTable=function(data,page=NULL,border=1,cellspacing=NA,cellpadding=NA,link=NULL,bgcolor=NULL,wiki=FALSE,style=NULL,width=NULL,icol.width=NULL,...) {
+hwriteRawTable=function(data,page=NULL,args.td=NULL,args.table=NULL,args.string=NULL) {
+  ## default arguments
+  if (is.null(args.table[['border']])) args.table[['border']]=1
+
   if (!is.matrix(data)) stop('\'data\' must be a matrix')
   dim=dim(data)
   data=as.vector(data)
   data[is.na(data)]='&nbsp;'
-
-  ## global versus local
-  if (is.matrix(style)) {
-    mstyle=style
-    gstyle=NULL
-  }
-  else {
-    gstyle=style
-    mstyle=NULL
-  }
   
-  ## process cells td
-  if (!is.null(link)) {
-    z=!is.na(link)
-    if (wiki) data[z]=paste('[',link[z],' ',data[z],']',sep='')
-    else data[z]=hmakeTag('a',data[z],href=link[z])
-  }
-  ## first td
-  tdwidth=matrix(NA,nr=dim[1],nc=dim[2])
-  if (!is.null(icol.width)) tdwidth[1,1:length(icol.width)]=icol.width
-  data=hmakeTag('td',data,bgcolor=bgcolor,width=tdwidth,style=mstyle)
+  ## process cell links
+  data=hwrite(data,link=args.td$link,table=F)
+  args.td$link=NULL
+  
+  ## process cells
+  data=do.call(hmakeTag,c(list('td',data),args.td))
   
   ## process rows tr
   dim(data)=dim
@@ -156,11 +177,10 @@ hwriteRawTable=function(data,page=NULL,border=1,cellspacing=NA,cellpadding=NA,li
 
   ## process table
   data=paste(data,collapse='')
-  str=hmakeTag('table',data,border=border,cellspacing=cellspacing,
-    cellpadding=cellpadding,newline=T,style=gstyle,width=width)
+  str=do.call(hmakeTag,c(list('table',data,newline=T),args.table))
   
   ## final
-  hwrite(str,page,...)
+  do.call(hwrite,c(list(str,page),args.string))
 }
 
 ## private

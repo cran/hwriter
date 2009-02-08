@@ -1,0 +1,8 @@
+TODO:
+- lists
+- split.table, split.table.args
+- <th> headings, <caption>
+- FIX: col.width doesn't work if nothing on the first row
+- FIX: split.max.x require a matrix for link even if data is a 1-row vector
+- icolwidth logic to be synced with rowcol logic
+
