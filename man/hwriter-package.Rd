@@ -9,10 +9,11 @@
   \code{hwriter} is an easy-to-use package able to format and
   output R objects in HTML format. It supports advanced formatting,
   tables, CSS styling, Javascript, images and provides a convenient mapping between
-  R tables and HTML tables.
+  R tables and HTML tables. \code{hwriter} generates XHTML 1.0 transitional
+  HTML code.
 
   See Examples and \code{hwrite} for more details.
-
+ 
   The project page is \url{http://www.ebi.ac.uk/~gpau/hwriter}.
 }
 

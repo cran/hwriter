@@ -1,3 +1,6 @@
+version 1.1:
+- example-hwriter.html contains now valid XHTML 1.0 code
+
 version 1.0: (CRAN)
 - major release
 - before: automatic 'style', now: 'table.style' and 'style' 
