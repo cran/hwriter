@@ -12,7 +12,7 @@
 
 \usage{
 openPage(filename, dirname=NULL, title=filename, link.javascript=NULL, 
-link.css=NULL, css=NULL, head=NULL)
+link.css=NULL, css=NULL, head=NULL, charset="utf-8", lang="en")
 
 closePage(page, splash=TRUE)
 }
@@ -37,6 +37,10 @@ closePage(page, splash=TRUE)
 
   \item{head}{an optional character string containing an HTML fragment
     to be added in the <head> section of the page.}
+
+  \item{charset}{an optional character string containing the current charset. Default is "utf-8".}
+
+  \item{lang}{an optional character string containing the current langage. Default is "en".}
 
   \item{page}{a page handle returned by a previous \code{openPage}
     call.}
