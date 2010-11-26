@@ -24,7 +24,7 @@
     \item \code{hwrite} outputs an R object in HTML format.
     \item \code{hwriteImage} writes an image.
     \item \code{openPage}, \code{closePage} handles HTML page/document 
-creation.
+    creation.
     \item \code{hmakeTag} is a low-level HTML tag formatting function.
   }
 }

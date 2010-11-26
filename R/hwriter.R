@@ -16,7 +16,6 @@ hwrite.matrix=function(x,...)
 hwrite.data.frame=function(x,...)
   hwrite.table(as.matrix(x),...)
 
-## public, flow
 ## switch between hwriteString and hwrite.matrix
 ## redimension 'dim' and 'byrow' matrix orientation
 hwrite.vector=function(data,page=NULL,...,table=NULL,names=NULL,byrow=NULL,dim=NULL) {
@@ -42,8 +41,8 @@ hwrite.vector=function(data,page=NULL,...,table=NULL,names=NULL,byrow=NULL,dim=N
   } else hwriteString(data,page=page,...)
 }
 
-## private, flow
-## ultimate string writing function
+## private
+## final string writing function
 hwriteString=function(txt,page=NULL,...,link=NULL,name=NULL,heading=NULL,center=NULL,br=NULL,div=NULL) {
   ## default arguments
   if (is.null(br)) br=FALSE
@@ -57,14 +56,18 @@ hwriteString=function(txt,page=NULL,...,link=NULL,name=NULL,heading=NULL,center=
   ## - 'div'  if div is TRUE
   ## - 'span' if args are present
   ## - no box otherwise
+  ##
+  ## also: removes <a> tags if corresponding href and argument values are NA
   boxtag=NULL
   if (!is.null(link)) {
-    args=c(args,list(href=link))
-    boxtag='a'
+    args=c(args, list(href=link))
+    boxtag = rep('a', length(link))
+    boxtag[is.na(link)] = NA
   }
   else if (!is.null(name)) {
-    args=c(args,list(name=name))
-    boxtag='a'
+    args=c(args, list(name=name))
+    boxtag = rep('a', length(name))
+    boxtag[is.na(name)] = NA
   }
   else if (!is.null(heading)) boxtag=paste('h',heading,sep='')
   else if (div) boxtag='div'
@@ -89,7 +92,6 @@ hwriteString=function(txt,page=NULL,...,link=NULL,name=NULL,heading=NULL,center=
   } else invisible(cat(txt,file=page)) 
 }
 
-## public
 hwriteImage=function(image.url,page=NULL,...,image.border=0,width=NULL,height=NULL,capture=FALSE) {
   ## take a snapshot of the current device ?
   if (capture) {
@@ -113,37 +115,38 @@ resync=function() {
   library(hwriter)
 }
 
-## public
-hmakeTag=function(tag,data=NULL,...,newline=FALSE) {
-  attrs=list(...)
+hmakeTag = function(tag, data=NULL, ..., newline=FALSE) {
+  attrs = list(...)
 
   ## dim is the output dim of the result
-  dim=dim(tag)
-  if (!is.null(dim(data))) dim=dim(data)
+  dim = dim(tag)
+  if (!is.null(dim(data))) dim = dim(data)
 
-  if (is.null(data)) data=''
-  na=length(attrs)
+  if (is.null(data)) data = ''
+  na = length(attrs)
 
   ## attributes grid
-  xattrs=NULL
+  xattrs = NULL
   if (na>0) {
-    namax=max(sapply(attrs,length))
-    n=max(c(length(tag),length(data),namax))
-    xattrs=matrix('',nr=n,nc=na)
-    nattrs=names(attrs)
+    namax = max(sapply(attrs, length))
+    n = max(c(length(tag), length(data), namax))
+    xattrs = matrix('', nr=n, nc=na)
+    nattrs = names(attrs)
     for (i in 1:na) {
-      z=attrs[[i]]
+      z = attrs[[i]]
       if (!is.null(z)) {
-        fna=!is.na(z)
-        xattrs[fna,i]=paste(' ',nattrs[i],'=\"',z[fna],'\"',sep='')
-        if (!is.null(dim(z))) dim=dim(z)
+        fna = !is.na(z)
+        xattrs[fna,i] = paste(' ',nattrs[i], '=\"', z[fna], '\"', sep='')
+        if (!is.null(dim(z))) dim = dim(z)
       }
     }
-    xattrs=apply(xattrs,1,paste,collapse='')
+    xattrs = apply(xattrs, 1, paste, collapse='')
   }
   
-  if (newline) nl='\n' else nl=NULL
-  res=paste('<',tag,xattrs,'>',nl,data,'</',tag,'>',nl,sep='')
-  if (!is.null(dim)) res=array(res,dim=dim)
+  if (newline) nl = '\n' else nl = NULL
+  res = paste('<', tag, xattrs, '>', nl, data, '</', tag, '>', nl, sep='')
+  natag = rep(is.na(tag), length(res)/length(tag))
+  res[natag] = paste(rep('', length(tag)), rep('', length(xattrs)), data, sep='')[natag]
+  if (!is.null(dim)) res = array(res, dim=dim)
   res
 }

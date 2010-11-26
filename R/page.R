@@ -1,5 +1,8 @@
-## public
-openPage=function(filename, dirname=NULL, title=filename, link.javascript=NULL, link.css=NULL, css=NULL, head=NULL, charset="utf-8", lang="en") {
+## page related functions
+
+openPage=function(filename, dirname=NULL, title=filename, link.javascript=NULL,
+  link.css=NULL, css=NULL, head=NULL, charset="utf-8", lang="en",
+  head.attributes=NULL, body.attributes=NULL) {
   if (!is.null(dirname)) {
     if (!file.exists(dirname)) dir.create(dirname, rec=TRUE, showWar=FALSE)
     filename = file.path(dirname, filename)
@@ -13,8 +16,10 @@ openPage=function(filename, dirname=NULL, title=filename, link.javascript=NULL, 
   if (!is.null(css)) css = paste(hmakeTag('style', css), collapse='\n')
   
   head = paste(meta, hmakeTag('title',title), head, link.javascript, link.css, css, sep='\n')
-  head = hmakeTag('head', head, newline=TRUE)
-  hwrite(paste(doctype, "<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='", lang, "' lang='", lang, "'>", head, '<body>', sep=''), page)
+  head = do.call(hmakeTag, c(list('head', head, newline=TRUE), head.attributes))
+  bodyStart = do.call(hmakeTag, c(list('body', NULL), body.attributes))
+  bodyStart = substr(bodyStart, 1, regexpr('</body>', bodyStart)-1)
+  hwrite(paste(doctype, "<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='", lang, "' lang='", lang, "'>", head, bodyStart, sep=''), page)
   page
 }
 
@@ -22,9 +27,8 @@ getHwriterVersion=function() {
   (sessionInfo()$otherPkgs)[['hwriter']]$Version
 }
 
-## public
 closePage=function(page, splash=TRUE) {
-  hwriterlink = hwrite('hwriter', link='http://www.ebi.ac.uk/~gpau/hwriter/index.html')
+  hwriterlink = hwrite('hwriter', link='http://www.embl.de/~gpau/hwriter/index.html')
   if (splash) hwrite(paste('\n<br/><br/><font size=\"-2\">(Page generated on ', date(), ' by ', hwriterlink, ' ', getHwriterVersion(), ')</font>', sep=''), page, br=TRUE)
   else hwrite('\n<br/><br/>', page, br=TRUE)
   hwrite('</body></html>', page, br=FALSE)

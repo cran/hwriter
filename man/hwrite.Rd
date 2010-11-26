@@ -105,7 +105,7 @@
       widths unspecified.}
       
   \item{row.*, col.*}{a list of character vectors or a character vector. Distributes the attribute '*' on the HTML table cells, according to rows (resp. columns).
-      Named lists (or vectors) point the corresponding rows/columns, according to their names. Unnamed lists (or vectors) point the rows/columns in the numeric order and NAs can be used to omit rows/columns. If pointed rows/columns sizes don't match, values are recycled using R rules.}
+      Named lists (or vectors) point the corresponding rows/columns, according to their names. Unnamed lists (or vectors) point the rows/columns in the numeric order and NAs can be used to omit rows/columns. If pointed rows/columns sizes don't match, vector values are recycled using R rules.}
     
   \item{table.*}{a character string. Uses the global table attribute '*' to render the HTML table. The attribute is added to the main <table> tag. Some uses include
       setting of the "border" and "margin" CSS attributes that cannot be distributed on cells.}

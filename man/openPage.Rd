@@ -12,7 +12,8 @@
 
 \usage{
 openPage(filename, dirname=NULL, title=filename, link.javascript=NULL, 
-link.css=NULL, css=NULL, head=NULL, charset="utf-8", lang="en")
+link.css=NULL, css=NULL, head=NULL, charset="utf-8", lang="en",
+head.attributes=NULL, body.attributes=NULL)
 
 closePage(page, splash=TRUE)
 }
@@ -40,8 +41,15 @@ closePage(page, splash=TRUE)
 
   \item{charset}{an optional character string containing the current charset. Default is "utf-8".}
 
-  \item{lang}{an optional character string containing the current langage. Default is "en".}
+  \item{lang}{an optional character string containing the current
+    langage. Default is "en".}
 
+  \item{head.attributes}{an optional named list of character strings,
+    containing the <head> attributes.}
+
+  \item{body.attributes}{an optional named list of character strings,
+    containing the <body> attributes.}
+  
   \item{page}{a page handle returned by a previous \code{openPage}
     call.}
 

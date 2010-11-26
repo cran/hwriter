@@ -5,5 +5,3 @@ TODO:
 - FIX: col.width doesn't work if nothing is present on the first row
 - FIX: split.max.x require a matrix for link even if data is a 1-row vector
 - icolwidth logic to be synced with rowcol logic
-- link=NULL creates empty <a> tags
-

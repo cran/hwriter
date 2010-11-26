@@ -60,8 +60,7 @@ hmapRowCol=function(x,rowcolnames) {
   y
 }
 
-## public, flow
-## - column and row names handling
+## handles row, col and table arguments
 hwrite.table=function(data,page=NULL,...,table=TRUE,row.names=T,col.names=T,split.maxncol=NULL,split.maxnrow=NULL,col.width=NULL) { 
   ddim=dim(data)
 
@@ -153,7 +152,7 @@ hexpand=function(a,db,ddb) {
   b
 }
 
-## private, flow
+## private
 hwriteRawTable=function(data,page=NULL,args.td=NULL,args.table=NULL,args.string=NULL) {
   ## default arguments
   if (is.null(args.table[['border']])) args.table[['border']]=1
