@@ -130,7 +130,7 @@ hmakeTag = function(tag, data=NULL, ..., newline=FALSE) {
   if (na>0) {
     namax = max(sapply(attrs, length))
     n = max(c(length(tag), length(data), namax))
-    xattrs = matrix('', nr=n, nc=na)
+    xattrs = matrix('', nrow=n, ncol=na)
     nattrs = names(attrs)
     for (i in 1:na) {
       z = attrs[[i]]

@@ -4,7 +4,7 @@ openPage=function(filename, dirname=NULL, title=filename, link.javascript=NULL,
   link.css=NULL, css=NULL, head=NULL, charset="utf-8", lang="en",
   head.attributes=NULL, body.attributes=NULL) {
   if (!is.null(dirname)) {
-    if (!file.exists(dirname)) dir.create(dirname, rec=TRUE, showWar=FALSE)
+    if (!file.exists(dirname)) dir.create(dirname, recursive=TRUE, showWarnings=FALSE)
     filename = file.path(dirname, filename)
   }
   page = file(filename,'wt')
