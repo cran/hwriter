@@ -14,7 +14,7 @@
 
   See Examples and \code{hwrite} for more details.
  
-  The project page is \url{http://www.ebi.ac.uk/~gpau/hwriter}.
+  %% The project page is \url{http://www.ebi.ac.uk/~gpau/hwriter}.
 }
 
 \section{Package content}{

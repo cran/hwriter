@@ -1,3 +1,7 @@
+importFrom("grDevices", "dev.print", "png")
+importFrom("stats", "na.omit")
+importFrom("utils", "browseURL", "sessionInfo")
+
 export('hwrite', 'openPage', 'closePage', 'hwriteImage',
        'hmakeTag')
 
